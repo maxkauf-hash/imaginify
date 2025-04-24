@@ -18,6 +18,7 @@ import {
 export const createUser = async (
   user: CreateUser
 ): Promise<CreateUserResponse> => {
+  console.log("Creating user", user);
   const newUser = await prisma.users.create({
     data: {
       clerkId: user.clerkId,
@@ -43,10 +44,22 @@ export const updateUser = async (
   return updateUserResponseSchema.parse(updatedUser);
 };
 
-export const deleteUser = async (id: string): Promise<DeleteUserResponse> => {
+export const deleteUser = async (
+  clerkId: string
+): Promise<DeleteUserResponse> => {
+  const user = await prisma.users.findUnique({
+    where: {
+      clerkId,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
   const deletedUser = await prisma.users.delete({
     where: {
-      id,
+      clerkId,
     },
   });
   return deleteUserResponseSchema.parse(deletedUser);
