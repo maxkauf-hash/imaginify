@@ -32,12 +32,12 @@ export const createUser = async (
 };
 
 export const updateUser = async (
-  id: string,
+  clerkId: string,
   user: UpdateUser
 ): Promise<UpdateUserResponse> => {
   const updatedUser = await prisma.users.update({
     where: {
-      id,
+      clerkId,
     },
     data: user,
   });
