@@ -3,7 +3,11 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 
-import { createUser } from "@/modules/users/actions/user.action";
+import {
+  createUser,
+  deleteUser,
+  updateUser,
+} from "@/modules/users/actions/user.action";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
@@ -74,30 +78,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "OK", user: newUser });
   }
 
-  // // UPDATE
-  // if (eventType === "user.updated") {
-  //   const { id, image_url, first_name, last_name, username } = evt.data;
+  // UPDATE
+  if (eventType === "user.updated") {
+    const { id, image_url, first_name, last_name, username } = evt.data;
 
-  //   const user = {
-  //     firstName: first_name,
-  //     lastName: last_name,
-  //     username: username!,
-  //     photo: image_url,
-  //   };
+    const user = {
+      id: id,
+      email: evt.data.email_addresses[0].email_address,
+      username: username!,
+      photo: image_url,
+      firstName: first_name!,
+      lastName: last_name!,
+    };
 
-  //   const updatedUser = await updateUser(id, user);
+    const updatedUser = await updateUser(id, user);
 
-  //   return NextResponse.json({ message: "OK", user: updatedUser });
-  // }
+    return NextResponse.json({ message: "OK", user: updatedUser });
+  }
 
-  // // DELETE
-  // if (eventType === "user.deleted") {
-  //   const { id } = evt.data;
+  // DELETE
+  if (eventType === "user.deleted") {
+    const { id } = evt.data;
 
-  //   const deletedUser = await deleteUser(id!);
+    const deletedUser = await deleteUser(id!);
 
-  //   return NextResponse.json({ message: "OK", user: deletedUser });
-  // }
+    return NextResponse.json({ message: "OK", user: deletedUser });
+  }
 
   console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
   console.log("Webhook body:", body);
